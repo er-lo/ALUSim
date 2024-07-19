@@ -29,6 +29,13 @@ public class ALUSimulator {
             operand1 = checkAndConvertOperand(input, brokenUpString[1]);
             operand2 = checkAndConvertOperand(input, brokenUpString[2]);
 
+            if (opcode.equals("add")) {
+                System.out.println(java.util.Arrays.toString(add(operand1, operand2)));
+            }
+
+            if (opcode.equals("sub")) {
+                System.out.println(java.util.Arrays.toString(add(operand1, twosCompliment(operand2))));
+            }
             // System.out.println("Output: " + opcode + " " +
             // java.util.Arrays.toString(operand1) + " "
             // + java.util.Arrays.toString(operand2));
@@ -89,11 +96,34 @@ public class ALUSimulator {
         return convertedOperand;
     }
 
-    // TODO: Write ADD Function
+    public static void ALU(String opcode, int[] operand1, int[] operand2) {}
 
-    // TODO: Write SUB Function
-    // this will be the same as the add function just make sure to call two's
-    // compliment of the second number
+    // TODO: Write ADD Function
+    public static int[] add(int[] operand1, int[] operand2){
+        int[] resultedOperand = { 0, 0, 0, 0 };
+        int[] carryOut = { 0, 0, 0, 0 };
+        int carryIn = 0;
+
+        for (int i = 3; i >= 0; i-- ){
+            carryOut[i] = operand1[i] + operand2[i] + carryIn;
+            if (carryOut[i] == 2) {
+                resultedOperand[i] = 0;
+                carryOut[i] = 1;
+            } else if (carryOut[i] == 1) {
+                resultedOperand[i] = 1;
+                carryOut[i] = 0;
+            } else {
+                resultedOperand[i] = 0;
+                carryOut[i] = 0;
+            }
+            carryIn = carryOut[i];
+        }
+
+
+        return resultedOperand;
+    }
+
+    // No need to write a subtraction function as all we're doing is addition with the two's compliment of the second operand.
 
     // TODO: Write AND Function
 
@@ -102,6 +132,17 @@ public class ALUSimulator {
     // TODO: Write SLT Function
 
     // TODO: Write Two's Compliment Function
+    public static int[] twosCompliment(int[] operand){
+        int[] one = { 0, 0, 0, 1 };
+        for(int i = 0; i <= 3; i++) {
+            if (operand[i] == 1) {
+                operand[i] = 0;
+            } else {
+                operand[i] = 1;
+            }
+        }
+        return add(operand, one);
+    }
 
     // TODO: Write Zero Detection Funtion
 }
