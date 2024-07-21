@@ -4,57 +4,111 @@
 // 4-bit MIPS ALU Simulation in Java
 //
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class ALUSimulator {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
-        String inputString, opcode;
+        String opcode, fileName, inputString;
         int[] operand1, operand2;
         String[] brokenUpString = { "", "", "" };
+        String[] fileStrings = new String[21];
 
+        fileName = "";
         inputString = "";
+
+        // code to accept file name argument
+        if (args.length == 0) {
+            System.out.println("Please enter the file name: ");
+            fileName = input.nextLine();
+        } else if (args.length == 1) {
+            fileName = args[0];
+        } else if (args.length >= 2) {
+            System.out.println("Seems like too many arguments were entered. Only the first argument will be used.");
+        }
+
+        // open the file and store the line into a string array
+        try {
+            Scanner file = new Scanner(new File(fileName));
+
+            int i = 0;
+            while (file.hasNextLine()) {
+                fileStrings[i] = file.nextLine();
+                i++;
+            }
+
+            file.close();
+        } catch (FileNotFoundException e) {
+        }
+
+        for (int i = 0; i < fileStrings.length - 1; i++) {
+            System.out.println(fileStrings[i]);
+            brokenUpString = fileStrings[i].split(" ");
+
+            // perform checks on the user input
+            opcode = checkOpcode(input, brokenUpString[0].toLowerCase());
+            operand1 = checkAndConvertOperand(input, brokenUpString[1]);
+            operand2 = checkAndConvertOperand(input, brokenUpString[2]);
+
+            // call the ALU with correct opcode and operands
+            ALU(opcode, operand1, operand2);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // The code below was the initial code to accept arguments before I realized
+        // that we needed to create an input file and read from that.
+        // I decided to keep it in as we can just uncomment the code below and comment
+        // the code above to execute however we want.
+        ////////////////////////////////////////////////////////////////////////////////
 
         // code to accept arguments, cases for each length of argument input
         // also case for no arguments provided
-        if (args.length == 1) {
-            brokenUpString[0] = args[0];
-            System.out.println("Please enter the first operand");
-            brokenUpString[1] = input.nextLine();
-            System.out.println("Please enter the second operand");
-            brokenUpString[2] = input.nextLine();
-        } else if (args.length == 2) {
-            brokenUpString[0] = args[0];
-            brokenUpString[1] = args[1];
-            System.out.println("Please enter the second operand");
-            brokenUpString[2] = input.nextLine();
-        } else if (args.length == 3) {
-            brokenUpString[0] = args[0];
-            brokenUpString[1] = args[1];
-            brokenUpString[2] = args[2];
-        } else if (args.length > 3) {
-            brokenUpString[0] = args[0];
-            brokenUpString[1] = args[1];
-            brokenUpString[2] = args[2];
-            System.out.println("Too many arguments were entered. Only the first three will be accepted.");
-        } else {
-            System.out.println("Input your command as a single line. e.g., Input Format: \"opcode operand1 operand2\"");
-            System.out.println("Enter your input: ");
-            inputString = input.nextLine();
-            brokenUpString = inputString.split(" ");
-        }
-
+        // if (args.length == 1) {
+        // brokenUpString[0] = args[0];
+        // System.out.println("Please enter the first operand");
+        // brokenUpString[1] = input.nextLine();
+        // System.out.println("Please enter the second operand");
+        // brokenUpString[2] = input.nextLine();
+        // } else if (args.length == 2) {
+        // brokenUpString[0] = args[0];
+        // brokenUpString[1] = args[1];
+        // System.out.println("Please enter the second operand");
+        // brokenUpString[2] = input.nextLine();
+        // } else if (args.length == 3) {
+        // brokenUpString[0] = args[0];
+        // brokenUpString[1] = args[1];
+        // brokenUpString[2] = args[2];
+        // } else if (args.length > 3) {
+        // brokenUpString[0] = args[0];
+        // brokenUpString[1] = args[1];
+        // brokenUpString[2] = args[2];
+        // System.out.println("Too many arguments were entered. Only the first three
+        // will be accepted.");
+        // } else {
+        // System.out.println("Input your command as a single line. e.g., Input Format:
+        // \"opcode operand1 operand2\"");
+        // System.out.println("Enter your input: ");
+        // inputString = input.nextLine();
+        // brokenUpString = inputString.split(" ");
+        // }
         // perform checks on the user input
-        opcode = checkOpcode(input, brokenUpString[0].toLowerCase());
-        operand1 = checkAndConvertOperand(input, brokenUpString[1]);
-        operand2 = checkAndConvertOperand(input, brokenUpString[2]);
+        // opcode = checkOpcode(input, brokenUpString[0].toLowerCase());
+        // operand1 = checkAndConvertOperand(input, brokenUpString[1]);
+        // operand2 = checkAndConvertOperand(input, brokenUpString[2]);
 
         // call the ALU with correct opcode and operands
-        ALU(opcode, operand1, operand2);
+        // ALU(opcode, operand1, operand2);
 
         // close scanner
         input.close();
     }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Again the following function is really only used when arguments are entered
+    // manually. It will check to ensure the opcode is a valid entry.
+    ////////////////////////////////////////////////////////////////////////////////
 
     // Function to check the opcode input and correct the opcode if it's not
     // correct.
@@ -69,6 +123,11 @@ public class ALUSimulator {
 
         return opcode;
     }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Same case as the function above.
+    // It will check to ensure the operands are valid entries.
+    ////////////////////////////////////////////////////////////////////////////////
 
     // Function to check if operands are 4 bit and actually binary. Also converts to
     // an array of ints for calculations.
@@ -204,6 +263,8 @@ public class ALUSimulator {
                     opcode.toUpperCase() + ": " + result + ", " + overflowDetectionResult + ", "
                             + zeroDetectionResult);
         }
+
+        System.out.println();
     }
 
     public static int adder(int operand1, int operand2, int carryIn) {
